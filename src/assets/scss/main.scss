@@ -10,6 +10,10 @@ body {
   margin: 0;
   background: $bg;
   color: $text;
+
+    ::selection{
+      color: $primary;
+    }
 }
 
 // 🧭 Container Setup
