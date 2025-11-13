@@ -5,7 +5,7 @@ import { Link, useNavigate } from "react-router-dom";
 import "../assets/scss/cart.scss"
 
 const CartPage: React.FC = () => {
-    const { cart } = useCart();
+    const { cart,clearCart } = useCart();
     const navigate = useNavigate();
     const total = cart.reduce((s, i) => s + i.price * i.quantity, 0);
 
@@ -32,8 +32,11 @@ const CartPage: React.FC = () => {
                             <div>Items: {cart.length}</div>
                             <div className="total">Total: ₹{total}</div>
                             <button onClick={() => navigate("/checkout")}>Checkout</button>
+                            <button onClick={clearCart}>Clear Cart</button>
                         </div>
                     </aside>
+                    <div>
+                    </div>
                 </div>
             )}
         </div>

@@ -29,7 +29,6 @@ export const CartProvider: React.FC<{ children: React.ReactNode }> = ({ children
         setCart((prev) => {
             const found = prev.find((x) => x.id === p.id);
             if (found) {
-                // Item already exists → show error toast
                 toast.error("Item is already in cart!", {
                     style: {
                         border: "1px solid #b00020",
@@ -42,7 +41,7 @@ export const CartProvider: React.FC<{ children: React.ReactNode }> = ({ children
                         secondary: "#fff",
                     },
                 });
-                return prev; // no change to cart
+                return prev;
             } else {
                 toast.success("Item added to cart!", {
                     style: {
@@ -57,8 +56,6 @@ export const CartProvider: React.FC<{ children: React.ReactNode }> = ({ children
                     },
                 });
             }
-
-            // ✅ Item not in cart → add it and show success toast
 
             return [...prev, { ...p, quantity: 1 }];
         });

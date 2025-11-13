@@ -1,7 +1,7 @@
 import React from "react";
 import { useCart } from "../context/CartContext";
 import type { Product } from "../data/products";
-import "../assets/scss/productCard.scss"; // 👈 import SCSS file
+import "../assets/scss/productcard.scss"
 
 const ProductCard: React.FC<{ product: Product }> = ({ product }) => {
   const { addToCart } = useCart();
