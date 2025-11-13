@@ -1,3 +1,4 @@
+// src/pages/Checkout.tsx
 import React, { useEffect, useRef, useState } from "react";
 import { useCart } from "../context/CartContext";
 import { useNavigate } from "react-router-dom";
@@ -15,63 +16,72 @@ const Checkout: React.FC = () => {
   const { cart, clearCart } = useCart();
   const [customer, setCustomer] = useState({ name: "", email: "", address: "" });
   const [loading, setLoading] = useState(false);
-  const [formValid, setFormValid] = useState(false); // ✅ to toggle PayPal button visibility
+  const [formValid, setFormValid] = useState(false);
   const paypalRef = useRef<HTMLDivElement | null>(null);
+  const paypalInstance = useRef<any>(null);
   const navigate = useNavigate();
 
-  const cartRef = useRef(cart);
-  const customerRef = useRef(customer);
-  const totalRef = useRef(0);
   const total = cart.reduce((sum, item) => sum + item.price * item.quantity, 0);
 
+  // Live validation for showing the PayPal button (no toasts here)
   useEffect(() => {
-    cartRef.current = cart;
-    customerRef.current = customer;
-    totalRef.current = total;
-
-    // 🧩 Simple validation check (run on every form update)
     const isValid =
-      customer.name.trim() &&
+      !!customer.name.trim() &&
       /\S+@\S+\.\S+/.test(customer.email) &&
-      customer.address.trim();
-
-    setFormValid(!!isValid);
-  }, [cart, customer, total]);
+      !!customer.address.trim() &&
+      total > 0;
+    setFormValid(isValid);
+  }, [customer, total]);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target;
     setCustomer((prev) => ({ ...prev, [name]: value }));
   };
 
-  const validateForm = () => {
-    const c = customerRef.current;
-    if (!c.name.trim() || !c.email.trim() || !c.address.trim()) {
-      toast.error("Please fill in all fields before proceeding to payment.");
-      return false;
-    }
-    if (!/\S+@\S+\.\S+/.test(c.email)) {
-      toast.error("Please enter a valid email address.");
-      return false;
-    }
-    return true;
-  };
-
-  // ✅ Initialize PayPal only once
+  // Render or remove PayPal buttons based on formValid and total.
   useEffect(() => {
-    if (!window.paypal || !paypalRef.current) return;
+    // ensure SDK + container are available
+    if (!paypalRef.current) return;
+    // If PayPal SDK not loaded, bail (user must include script in index.html)
+    if (!window.paypal) {
+      console.error("PayPal SDK not loaded. Add script to index.html with your sandbox client ID.");
+      return;
+    }
 
-    const paypalButtons = window.paypal.Buttons({
-      style: { layout: "vertical", color: "gold", shape: "pill", label: "pay" },
+    // If form invalid or cart empty -> remove buttons and reset instance
+    if (!formValid) {
+      // cleanup any existing buttons
+      paypalRef.current.innerHTML = "";
+      if (paypalInstance.current && typeof paypalInstance.current.close === "function") {
+        try { paypalInstance.current.close(); } catch {}
+      }
+      paypalInstance.current = null;
+      return;
+    }
 
+    // If already rendered, do nothing
+    if (paypalInstance.current) return;
+
+    // Render PayPal buttons once (only when formValid true)
+    paypalInstance.current = window.paypal.Buttons({
+      style: { layout: "vertical", color: "gold", shape: "pill", label: "paypal" },
+
+      // Do NOT run validation here. Button is only rendered when formValid === true.
       createOrder: (_data: any, actions: any) => {
-        if (!validateForm()) {
-          throw new Error("Form invalid — stop payment.");
+        // double-check total
+        if (total <= 0) {
+          // return a rejected promise to stop creation; don't throw
+          return Promise.reject(new Error("Cart total invalid"));
         }
+
         return actions.order.create({
           purchase_units: [
             {
               description: "Dairy Product Purchase",
-              amount: { currency_code: "INR", value: totalRef.current.toFixed(2) },
+              amount: {
+                currency_code: "USD", // use USD for sandbox tests
+                value: total.toFixed(2),
+              },
             },
           ],
         });
@@ -81,42 +91,49 @@ const Checkout: React.FC = () => {
         setLoading(true);
         try {
           const order = await actions.order.capture();
-          console.log("✅ Order captured:", order);
+          console.log("Order captured:", order);
 
           const orderId = order.id;
-          const items = cartRef.current.map((i) => `${i.title} x${i.quantity}`).join(", ");
+          const items = cart.map((i) => `${i.title} ×${i.quantity}`).join(", ");
           const orderData = {
             id: orderId,
-            customer: customerRef.current,
+            customer,
             items,
-            total: totalRef.current,
+            total,
             status: "Paid",
             date: new Date().toLocaleString(),
           };
 
+          // save locally
           const orders = JSON.parse(localStorage.getItem("orders") || "[]");
           orders.unshift(orderData);
           localStorage.setItem("orders", JSON.stringify(orders));
 
-          await emailjs.send(
-            "service_g7ltfyk",
-            "template_f9cu75j",
-            {
-              to_name: customerRef.current.name,
-              to_email: customerRef.current.email,
-              order_id: orderId,
-              order_summary: items,
-              total: `₹${totalRef.current}`,
-              address: customerRef.current.address,
-            },
-            "UDfYVwWgIqflar-pu"
-          );
+          // send email (EmailJS)
+          try {
+            await emailjs.send(
+              "service_g7ltfyk",
+              "template_f9cu75j",
+              {
+                to_name: customer.name,
+                to_email: customer.email,
+                order_id: orderId,
+                order_summary: items,
+                total: `₹${total}`,
+                address: customer.address,
+              },
+              "UDfYVwWgIqflar-pu"
+            );
+          } catch (emailErr) {
+            console.error("EmailJS send failed:", emailErr);
+            // still proceed — email failure shouldn't break payment
+          }
 
-          toast.success("✅ Order placed successfully!");
+          toast.success("✅ Payment successful! Order placed.");
           clearCart();
           navigate("/orders", { replace: true });
         } catch (err) {
-          console.error("❌ Payment error:", err);
+          console.error("PayPal capture error:", err);
           toast.error("Payment failed. Please try again.");
         } finally {
           setLoading(false);
@@ -124,13 +141,30 @@ const Checkout: React.FC = () => {
       },
 
       onError: (err: any) => {
-        console.error("⚠️ PayPal Error:", err);
-        toast.error("Something went wrong with PayPal.");
+        console.error("PayPal SDK Error:", err);
+        toast.error("Something went wrong with PayPal. Please try again.");
       },
     });
 
-    paypalButtons.render(paypalRef.current);
-  }, [clearCart, navigate]);
+    // render and keep instance
+    paypalInstance.current.render(paypalRef.current).catch((err: any) => {
+      // rendering error
+      console.error("PayPal render error:", err);
+      toast.error("Failed to render PayPal. Please refresh and try again.");
+      paypalRef.current && (paypalRef.current.innerHTML = "");
+      paypalInstance.current = null;
+    });
+
+    // cleanup when unmount or when deps change
+    return () => {
+      if (paypalInstance.current && typeof paypalInstance.current.close === "function") {
+        try { paypalInstance.current.close(); } catch {}
+      }
+      paypalInstance.current = null;
+      if (paypalRef.current) paypalRef.current.innerHTML = "";
+    };
+    // Only depend on formValid & total (render only when these change)
+  }, [formValid, total, cart, clearCart, navigate, customer]);
 
   return (
     <div className="container">
@@ -170,21 +204,25 @@ const Checkout: React.FC = () => {
 
         <div className="paypal-box">
           <h3>Pay Securely</h3>
-          {/* ✅ Disable or hide PayPal button until form valid */}
+
+          {/* PayPal container - visible but will only contain the real button when formValid is true */}
           <div
             style={{
-              opacity: formValid ? 1 : 0.4,
+              opacity: formValid ? 1 : 0.5,
               pointerEvents: formValid ? "auto" : "none",
-              transition: "opacity 0.3s",
+              transition: "opacity 0.25s",
+              minHeight: 48,
             }}
           >
-            <div ref={paypalRef}></div>
+            <div ref={paypalRef} />
           </div>
+
           {!formValid && (
-            <p style={{ color: "red", fontSize: "0.9rem" }}>
-              Please fill in your details to enable payment.
+            <p style={{ color: "red", fontSize: "0.9rem", marginTop: 8 }}>
+              Please fill all fields (name, valid email, address) and ensure cart has items to enable PayPal.
             </p>
           )}
+
           {loading && <p>Processing your payment...</p>}
         </div>
       </div>
