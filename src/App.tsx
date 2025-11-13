@@ -7,6 +7,7 @@ import CartPage from "./pages/CartPage";
 import Checkout from "./pages/Checkout";
 import Orders from "./pages/Orders";
 import { Toaster } from "react-hot-toast";
+import CustomCursor from "./components/CustomCursor";
 
 
 function App() {
@@ -17,6 +18,7 @@ function App() {
         position="top-right"
         reverseOrder={false}
       />
+      <CustomCursor/>
       <Routes>
         <Route path="/" element={<Home />} />
         <Route path="/shop" element={<Shop />} />
