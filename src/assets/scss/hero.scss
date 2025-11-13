@@ -1,0 +1,92 @@
+@import "./variables";
+
+.hero {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 40px;
+  padding: 60px 0;
+  background: linear-gradient(135deg, #fffef7 0%, $background-color 100%);
+  border-radius: $radius;
+  box-shadow: $shadow;
+
+  &__text {
+    flex: 1;
+    h1 {
+      font-size: 2.8rem;
+      color: $secondary-color;
+      margin-bottom: 12px;
+      font-weight: 700;
+      line-height: 1.2;
+    }
+
+    p {
+      color: $muted;
+      font-size: 1.05rem;
+      max-width: 480px;
+      line-height: 1.6;
+    }
+
+    .hero__cta {
+      margin-top: 20px;
+    }
+
+    .hero__btn {
+      background: $primary-color;
+      border: none;
+      color: white;
+      font-size: 1rem;
+      font-weight: 600;
+      padding: 12px 24px;
+      border-radius: 12px;
+      cursor: pointer;
+      box-shadow: 0 4px 12px rgba($primary-color, 0.4);
+      transition: $transition;
+
+      &:hover {
+        background: darken($primary-color, 10%);
+        transform: translateY(-2px);
+        box-shadow: 0 6px 14px rgba($primary-color, 0.5);
+      }
+    }
+  }
+
+  &__img {
+    flex: 1;
+    display: flex;
+    justify-content: center;
+
+    img {
+      width: 100%;
+      max-width: 450px;
+      border-radius: $radius;
+      object-fit: cover;
+      box-shadow: $shadow;
+    }
+  }
+}
+
+/* 🌐 Responsive tweaks */
+@media (max-width: 900px) {
+  .hero {
+    flex-direction: column;
+    text-align: center;
+    padding: 40px 20px;
+
+    &__text {
+      h1 {
+        font-size: 2.2rem;
+      }
+      p {
+        margin: 0 auto;
+      }
+    }
+
+    &__img {
+      margin-top: 20px;
+      img {
+        max-width: 350px;
+      }
+    }
+  }
+}

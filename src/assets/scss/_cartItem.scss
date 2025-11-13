@@ -1,0 +1,85 @@
+@import "./variables";
+
+.cart-item {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  background: $card-bg;
+  padding: 16px 20px;
+  border-radius: $radius;
+  box-shadow: $shadow;
+  margin-bottom: 14px;
+  transition: $transition;
+
+  &:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 16px rgba(0, 0, 0, 0.12);
+  }
+
+  &__img {
+    width: 80px;
+    height: 80px;
+    border-radius: 10px;
+    object-fit: cover;
+    border: 2px solid rgba(0, 0, 0, 0.05);
+  }
+
+  &__details {
+    flex: 1;
+
+    .cart-item__title {
+      font-size: 1.05rem;
+      font-weight: 600;
+      color: $text-color;
+    }
+
+    .cart-item__price {
+      font-size: 0.95rem;
+      color: $muted;
+      margin-top: 4px;
+    }
+  }
+
+  &__actions {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+
+    .qty-btn {
+      background: $primary-color;
+      border: none;
+      color: white;
+      font-size: 1rem;
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      cursor: pointer;
+      transition: $transition;
+
+      &:hover {
+        background: darken($primary-color, 10%);
+      }
+    }
+
+    .cart-item__quantity {
+      font-weight: 600;
+      min-width: 24px;
+      text-align: center;
+      color: $text-color;
+    }
+
+    .remove-btn {
+      background: none;
+      border: 1px solid rgba(0, 0, 0, 0.1);
+      color: $error-color;
+      padding: 6px 10px;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: $transition;
+
+      &:hover {
+        background: rgba(230, 57, 70, 0.1);
+      }
+    }
+  }
+}

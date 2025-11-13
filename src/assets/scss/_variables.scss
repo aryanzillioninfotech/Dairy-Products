@@ -1,0 +1,21 @@
+// ===========================
+// THEME VARIABLES
+// ===========================
+
+$primary-color: #ffb703;       // warm butter yellow
+$primary: #ffb703;       // warm butter yellow
+$secondary-color: #023047;     // deep dairy blue
+$accent-color: #fb8500;        // orange accent
+$bg: #fefae0;    // light cream
+$background-color: #fefae0;    // light cream
+$card-bg: #ffffff;             // 🥛 white card background
+$text-color: #333;             // standard text color
+$muted: #777;                  // muted/secondary text
+$success-color: #4caf50;
+$error-color: #e63946;
+
+// aliases
+$text: $text-color;            
+$radius: 16px;
+$transition: all 0.3s ease;
+$shadow: 0 4px 12px rgba(0, 0, 0, 0.08);

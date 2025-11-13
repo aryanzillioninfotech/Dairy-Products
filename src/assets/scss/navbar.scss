@@ -1,0 +1,70 @@
+@import "./variables";
+
+.navbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 18px 0;
+  background: $card-bg;
+  border-radius: $radius;
+  box-shadow: $shadow;
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  transition: $transition;
+
+  .navbar__brand {
+    a {
+      font-size: 1.6rem;
+      font-weight: 700;
+      text-decoration: none;
+      color: $secondary-color;
+      transition: $transition;
+
+      &:hover {
+        color: $primary-color;
+      }
+    }
+  }
+
+  .navbar__links {
+    display: flex;
+    gap: 20px;
+
+    a {
+      text-decoration: none;
+      font-weight: 500;
+      color: $text-color;
+      padding: 8px 14px;
+      border-radius: 8px;
+      transition: $transition;
+
+      &:hover {
+        background: rgba($primary-color, 0.1);
+        color: $primary-color;
+      }
+    }
+  }
+}
+
+/* 🌐 Responsive Navbar */
+@media (max-width: 768px) {
+  .navbar {
+    flex-direction: column;
+    align-items: flex-start;
+    padding: 16px;
+
+    .navbar__brand {
+      margin-bottom: 10px;
+    }
+
+    .navbar__links {
+      flex-wrap: wrap;
+      gap: 10px;
+
+      a {
+        padding: 6px 10px;
+      }
+    }
+  }
+}

@@ -1,0 +1,27 @@
+@import './variables';
+@import './mixins';
+@import './layout';
+@import './components';
+@import "./cartItem";
+
+// 🌐 Global Styles
+body {
+  font-family: "Poppins", sans-serif;
+  margin: 0;
+  background: $bg;
+  color: $text;
+}
+
+// 🧭 Container Setup
+.container {
+  width: 100%;
+  max-width: 1200px; // 👈 this is your ideal max-width
+  margin: 0 auto;    // centers the content
+  padding: 0 20px;   // adds breathing room on smaller screens
+}
+
+// 🧈 Utility Classes
+.text-center { text-align: center; }
+.mt-2 { margin-top: 20px; }
+.mb-2 { margin-bottom: 20px; }
+
