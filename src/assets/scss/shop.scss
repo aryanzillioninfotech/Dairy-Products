@@ -1,99 +1,55 @@
 @import "variables";
-.shop-page {
+
+.shop {
+  padding: 40px 0;
+
   h2 {
     font-size: 2rem;
-    color: $primary;
-    font-weight: 700;
-    text-align: center;
-    margin-bottom: 24px;
-    position: relative;
-
-    &::after {
-      content: "";
-      display: block;
-      width: 60px;
-      height: 3px;
-      background: $primary;
-      margin: 8px auto 0;
-      border-radius: 2px;
-    }
+    margin-bottom: 20px;
   }
 
-  .grid {
+  .product-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
-    gap: 24px;
-    margin-top: 20px;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 25px;
   }
 
   .product-card {
     background: #fff;
-    border-radius: 16px;
-    overflow: hidden;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
-    transition: transform 0.25s ease, box-shadow 0.25s ease;
+    border-radius: 14px;
+    padding: 20px;
     text-align: center;
-    padding: 16px;
+    box-shadow: 0 4px 14px rgba(0, 0, 0, 0.08);
+    transition: 0.3s;
 
     &:hover {
-      transform: translateY(-5px);
-      box-shadow: 0 8px 18px rgba(0, 0, 0, 0.08);
+      transform: translateY(-4px);
     }
 
     img {
       width: 100%;
-      height: 180px;
+      height: 200px;
       object-fit: cover;
-      border-radius: 12px;
-      margin-bottom: 12px;
-    }
-
-    h3 {
-      font-size: 1.1rem;
-      color: $text;
-      margin-bottom: 6px;
-    }
-
-    .price {
-      color: $primary;
-      font-weight: 700;
-      margin-bottom: 8px;
-    }
-
-    p {
-      color: $muted;
-      font-size: 0.9rem;
-      line-height: 1.4;
+      border-radius: 10px;
       margin-bottom: 12px;
     }
 
     button {
-      background: $primary;
+      background: $primary-color;
       color: #fff;
       border: none;
-      border-radius: 8px;
-      padding: 8px 14px;
+      padding: 10px 20px;
+      border-radius: 10px;
       font-weight: 600;
       cursor: pointer;
-      transition: background 0.25s ease;
+      transition: $transition;
+      box-shadow: 0 4px 10px rgba($primary-color, 0.4);
 
       &:hover {
-        background: darken($primary, 7%);
+        background: darken($primary-color, 8%);
+        transform: translateY(-2px);
+        box-shadow: 0 6px 14px rgba($primary-color, 0.5);
       }
-    }
-  }
-
-  @media (max-width: 768px) {
-    .grid {
-      gap: 16px;
-    }
-
-    .product-card {
-      padding: 12px;
-    }
-
-    h2 {
-      font-size: 1.6rem;
     }
   }
 }
