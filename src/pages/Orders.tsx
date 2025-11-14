@@ -1,16 +1,27 @@
 import React, { useEffect, useState } from "react";
-import "../assets/scss/orders.scss"
+import "../assets/scss/orders.scss";
+import axios from "axios";
 
 const Orders: React.FC = () => {
   const [orders, setOrders] = useState<any[]>([]);
+
   useEffect(() => {
-    const raw = localStorage.getItem("orders");
-    if (raw) setOrders(JSON.parse(raw));
+    const fetchOrders = async () => {
+      try {
+        const res = await axios.get("http://localhost:5000/orders");
+        setOrders(res.data);
+      } catch (error) {
+        console.error("Error fetching orders:", error);
+      }
+    };
+
+    fetchOrders(); 
   }, []);
 
   return (
     <div className="container orders-page">
       <h2>My Orders</h2>
+
       {orders.length === 0 ? (
         <p>No orders yet.</p>
       ) : (
@@ -28,6 +39,7 @@ const Orders: React.FC = () => {
                 <div className="customer">
                   <strong>To:</strong> {o.customer.name} — {o.customer.email}
                 </div>
+
                 <div className="address">
                   <strong>Address:</strong> {o.customer.address}
                 </div>

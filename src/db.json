@@ -44,5 +44,30 @@
     }
   ],
   "orders": [],
-  "cart": []
+  "cart": [
+    {
+      "id": "p3",
+      "title": "White Butter (250g)",
+      "price": 95,
+      "img": "images/product-image-6-300x300.jpg",
+      "desc": "Creamy churned butter.",
+      "quantity": 1
+    },
+    {
+      "id": "p4",
+      "title": "Ghee (250g)",
+      "price": 240,
+      "img": "images/product-image-4-300x300.jpg",
+      "desc": "Aromatic desi ghee.",
+      "quantity": 1
+    },
+    {
+      "id": "p2",
+      "title": "Paneer (200g)",
+      "price": 120,
+      "img": "images/product-image-3-300x300.jpg",
+      "desc": "Soft homemade paneer.",
+      "quantity": 1
+    }
+  ]
 }

@@ -5,6 +5,7 @@ import { useNavigate } from "react-router-dom";
 import emailjs from "emailjs-com";
 import toast from "react-hot-toast";
 import "../assets/scss/checkout.scss";
+import axios from "axios";
 
 declare global {
   interface Window {
@@ -88,57 +89,61 @@ const Checkout: React.FC = () => {
       },
 
       onApprove: async (_data: any, actions: any) => {
-        setLoading(true);
-        try {
-          const order = await actions.order.capture();
-          console.log("Order captured:", order);
+  setLoading(true);
+  try {
+    const order = await actions.order.capture();
+    console.log("Order captured:", order);
 
-          const orderId = order.id;
-          const items = cart.map((i) => `${i.title} ×${i.quantity}`).join(", ");
-          const orderData = {
-            id: orderId,
-            customer,
-            items,
-            total,
-            status: "Paid",
-            date: new Date().toLocaleString(),
-          };
+    const orderId = order.id;
+    const items = cart.map((i) => `${i.title} ×${i.quantity}`).join(", ");
 
-          // save locally
-          const orders = JSON.parse(localStorage.getItem("orders") || "[]");
-          orders.unshift(orderData);
-          localStorage.setItem("orders", JSON.stringify(orders));
+    const orderData = {
+      id: orderId,
+      customer,
+      items,
+      total,
+      status: "Paid",
+      date: new Date().toLocaleString(),
+    };
 
-          // send email (EmailJS)
-          try {
-            await emailjs.send(
-              "service_g7ltfyk",
-              "template_f9cu75j",
-              {
-                to_name: customer.name,
-                to_email: customer.email,
-                order_id: orderId,
-                order_summary: items,
-                total: `₹${total}`,
-                address: customer.address,
-              },
-              "UDfYVwWgIqflar-pu"
-            );
-          } catch (emailErr) {
-            console.error("EmailJS send failed:", emailErr);
-            // still proceed — email failure shouldn't break payment
-          }
+    // 👉 Save order to json-server
+    await axios.post("http://localhost:5000/orders", orderData);
 
-          toast.success("✅ Payment successful! Order placed.");
-          clearCart();
-          navigate("/orders", { replace: true });
-        } catch (err) {
-          console.error("PayPal capture error:", err);
-          toast.error("Payment failed. Please try again.");
-        } finally {
-          setLoading(false);
-        }
-      },
+    // 👉 Send confirmation email via EmailJS (unchanged)
+    try {
+      await emailjs.send(
+        "service_g7ltfyk",
+        "template_f9cu75j",
+        {
+          to_name: customer.name,
+          to_email: customer.email,
+          order_id: orderId,
+          order_summary: items,
+          total: `₹${total}`,
+          address: customer.address,
+        },
+        "UDfYVwWgIqflar-pu"
+      );
+    } catch (emailErr) {
+      console.error("EmailJS send failed:", emailErr);
+    }
+
+    toast.success("✅ Payment successful! Order placed.");
+
+    // 👉 Clear cart in json-server
+    await axios.patch("http://localhost:5000/cart", { cart: [] });
+
+    clearCart(); // UI update only
+    navigate("/orders", { replace: true });
+
+  } catch (err) {
+    console.error("PayPal capture error:", err);
+    toast.error("Payment failed. Please try again.");
+  } finally {
+    setLoading(false);
+  }
+},
+
 
       onError: (err: any) => {
         console.error("PayPal SDK Error:", err);
